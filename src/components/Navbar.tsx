@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ArrowRight } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
+import { useTheme } from "@/context/ThemeContext";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
 
@@ -11,6 +12,8 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { t } = useLanguage();
+  const { theme } = useTheme();
+  const isLight = theme === "light";
 
   useEffect(() => {
     const handleScroll = () => {
@@ -47,11 +50,20 @@ export default function Navbar() {
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Logo */}
-          <a href="#" className="flex items-center gap-2 group clickable">
-            <span className="text-2xl md:text-3xl font-heading font-black tracking-widest transition-all" style={{ color: "var(--th-text)" }}>
+          <a href="#" className="relative flex items-center gap-2 group clickable">
+            {isLight && (
+              <span
+                className="absolute -inset-3 rounded-full pointer-events-none"
+                style={{ background: "#FDF0D5", opacity: 0.15, filter: "blur(20px)" }}
+              />
+            )}
+            <span
+              className="relative text-2xl md:text-3xl font-heading font-black tracking-widest transition-all"
+              style={{ color: isLight ? "#003049" : "var(--th-text)", fontWeight: isLight ? 800 : undefined }}
+            >
               RIVAN
             </span>
-            <span className="w-1.5 h-1.5 rounded-full group-hover:scale-150 transition-transform" style={{ background: "var(--th-brand)" }} />
+            <span className="relative w-1.5 h-1.5 rounded-full group-hover:scale-150 transition-transform" style={{ background: "var(--th-brand)" }} />
           </a>
 
           {/* Desktop Nav Links */}
@@ -60,8 +72,16 @@ export default function Navbar() {
               <a
                 key={link.name}
                 href={link.href}
-                className="text-sm font-sans tracking-wide transition-colors relative group py-2 clickable"
-                style={{ color: "var(--th-muted)" }}
+                className={`text-sm font-sans relative group py-2 clickable ${
+                  isLight
+                    ? "text-[#003049] font-semibold hover:text-[#C1121F] transition-colors duration-300"
+                    : "tracking-wide transition-colors"
+                }`}
+                style={
+                  isLight
+                    ? { letterSpacing: "0.02em", textShadow: "0 1px 4px rgba(255,255,255,0.25)" }
+                    : { color: "var(--th-muted)" }
+                }
               >
                 {link.name}
                 <span className="absolute bottom-0 left-0 w-0 h-[1px] group-hover:w-full transition-all duration-300" style={{ background: "var(--th-brand)" }} />
@@ -78,7 +98,12 @@ export default function Navbar() {
 
             <a
               href="#contact"
-              className="hidden sm:inline-flex items-center gap-2 px-6 py-2.5 rounded-full border border-[#BFC2C7]/30 text-sm font-medium tracking-wide bg-transparent hover:bg-[#B11226] text-[#F8F8F8] hover:border-[#B11226] hover:shadow-[0_0_20px_rgba(177,18,38,0.3)] transition-all duration-300 clickable"
+              className={
+                isLight
+                  ? "hidden sm:inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-bold bg-[#C1121F] text-white hover:bg-[#780000] hover:shadow-[0_10px_30px_rgba(193,18,31,0.25)] transition-all duration-300 clickable"
+                  : "hidden sm:inline-flex items-center gap-2 px-6 py-2.5 rounded-full border border-[#BFC2C7]/30 text-sm font-medium tracking-wide bg-transparent hover:bg-[#B11226] text-[#F8F8F8] hover:border-[#B11226] hover:shadow-[0_0_20px_rgba(177,18,38,0.3)] transition-all duration-300 clickable"
+              }
+              style={isLight ? { letterSpacing: "0.04em" } : undefined}
             >
               {t("nav", "workWithUs")}
               <ArrowRight size={14} />

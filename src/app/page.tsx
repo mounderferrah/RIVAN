@@ -11,6 +11,7 @@ import WhyChooseUs from "@/components/WhyChooseUs";
 import Process from "@/components/Process";
 import Manifesto from "@/components/Manifesto";
 import Team from "@/components/Team";
+import AtmosphereBeam from "@/components/AtmosphereBeam";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 
@@ -52,9 +53,12 @@ export default function Home() {
               <Services />
               <About />
               <WhyChooseUs />
-              <Process />
-              <Manifesto />
-              <Team />
+              <div className="relative">
+                <AtmosphereBeam />
+                <Process />
+                <Manifesto />
+                <Team />
+              </div>
               <Contact />
             </main>
 

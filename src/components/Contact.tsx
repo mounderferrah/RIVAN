@@ -1,18 +1,33 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mail, PhoneCall, Send, CheckCircle2 } from "lucide-react";
+import { Mail, PhoneCall, Send, CheckCircle2, ChevronDown } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
+import { useTheme } from "@/context/ThemeContext";
 import translations from "@/translations";
 
 export default function Contact() {
   const { t, lang } = useLanguage();
+  const { theme } = useTheme();
+  const isLight = theme === "light";
   const contactT = translations[lang].contact;
   const [formData, setFormData] = useState({ name: "", email: "", company: "", service: "", message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [serviceOpen, setServiceOpen] = useState(false);
+  const serviceRef = useRef<HTMLDivElement>(null);
   const servicesList = contactT.services as unknown as string[];
+
+  useEffect(() => {
+    function handleOutsideClick(e: MouseEvent) {
+      if (serviceRef.current && !serviceRef.current.contains(e.target as Node)) {
+        setServiceOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -192,27 +207,87 @@ export default function Contact() {
                       </div>
                     </div>
 
-                    {/* Service Needed Dropdown */}
+                    {/* Service Needed Dropdown — custom listbox (native <select>/<option>
+                        popups can't be styled with radius/shadow/hover across browsers,
+                        and were rendering with hardcoded dark colors in Light Mode) */}
                     <div className="flex flex-col gap-2">
                       <label htmlFor="service" className="text-xs font-semibold tracking-wider text-zinc-400 uppercase">
                         {t("contact", "labelService")}
                       </label>
-                      <select
-                        id="service"
-                        required
-                        value={formData.service}
-                        onChange={(e) => setFormData({ ...formData, service: e.target.value })}
-                        className="w-full px-5 py-4 rounded-xl bg-white/5 border border-white/5 text-sm font-sans text-zinc-300 focus:outline-none focus:border-primary focus:bg-white/10 focus:shadow-[0_0_15px_rgba(177,18,38,0.1)] transition-all appearance-none"
-                      >
-                        <option value="" disabled className="bg-zinc-950 text-zinc-500">
-                          {t("contact", "placeService")}
-                        </option>
-                        {servicesList.map((svc) => (
-                          <option key={svc} value={svc} className="bg-zinc-950 text-white">
-                            {svc}
-                          </option>
-                        ))}
-                      </select>
+                      <div ref={serviceRef} className="relative">
+                        <button
+                          type="button"
+                          id="service"
+                          aria-haspopup="listbox"
+                          aria-expanded={serviceOpen}
+                          onClick={() => setServiceOpen((o) => !o)}
+                          className="w-full px-5 py-4 rounded-xl bg-white/5 border border-white/5 text-sm font-sans text-left flex items-center justify-between gap-3 focus:outline-none focus:border-primary focus:bg-white/10 focus:shadow-[0_0_15px_rgba(177,18,38,0.1)] transition-all"
+                          style={{
+                            color: formData.service
+                              ? (isLight ? "#003049" : "#ffffff")
+                              : (isLight ? "rgba(0,48,73,0.45)" : "#71717a"),
+                          }}
+                        >
+                          <span className="truncate">{formData.service || t("contact", "placeService")}</span>
+                          <ChevronDown
+                            size={16}
+                            className="flex-shrink-0 transition-transform duration-200"
+                            style={{ opacity: 0.6, transform: serviceOpen ? "rotate(180deg)" : "rotate(0deg)" }}
+                          />
+                        </button>
+
+                        <AnimatePresence>
+                          {serviceOpen && (
+                            <motion.div
+                              role="listbox"
+                              initial={{ opacity: 0, y: -6, scale: 0.98 }}
+                              animate={{ opacity: 1, y: 0, scale: 1 }}
+                              exit={{ opacity: 0, y: -6, scale: 0.98 }}
+                              transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                              className="absolute left-0 right-0 top-full mt-2 z-50 overflow-y-auto no-scrollbar"
+                              style={{
+                                background: isLight ? "#FFFFFF" : "#0b0b0d",
+                                border: `1px solid ${isLight ? "rgba(0,48,73,0.12)" : "rgba(255,255,255,0.08)"}`,
+                                borderRadius: 16,
+                                boxShadow: isLight ? "0 20px 60px rgba(0,0,0,0.08)" : "0 20px 60px rgba(0,0,0,0.45)",
+                                maxHeight: 280,
+                                padding: 6,
+                              }}
+                            >
+                              {servicesList.map((svc) => {
+                                const selected = formData.service === svc;
+                                return (
+                                  <button
+                                    key={svc}
+                                    type="button"
+                                    role="option"
+                                    aria-selected={selected}
+                                    onClick={() => { setFormData({ ...formData, service: svc }); setServiceOpen(false); }}
+                                    className="w-full text-left px-4 py-3 text-sm font-sans rounded-lg transition-colors duration-150"
+                                    style={{
+                                      background: selected
+                                        ? (isLight ? "rgba(193,18,31,0.10)" : "rgba(177,18,38,0.15)")
+                                        : "transparent",
+                                      color: selected
+                                        ? (isLight ? "#C1121F" : "#B11226")
+                                        : (isLight ? "#003049" : "#ffffff"),
+                                      fontWeight: selected ? 600 : 400,
+                                    }}
+                                    onMouseEnter={(e) => {
+                                      if (!selected) e.currentTarget.style.background = isLight ? "rgba(193,18,31,0.06)" : "rgba(255,255,255,0.06)";
+                                    }}
+                                    onMouseLeave={(e) => {
+                                      if (!selected) e.currentTarget.style.background = "transparent";
+                                    }}
+                                  >
+                                    {svc}
+                                  </button>
+                                );
+                              })}
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
                     </div>
 
                     {/* Message */}

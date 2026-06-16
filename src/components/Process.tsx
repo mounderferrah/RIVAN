@@ -7,14 +7,19 @@ import { useLanguage } from "@/context/LanguageContext";
 import { useTheme } from "@/context/ThemeContext";
 
 // ─── Orbital constants ────────────────────────────────────────────────────────
-const CX = 250, CY = 250;
+// Canvas enlarged (was 500×500 / CX,CY=250) to give the now much wider orbit
+// spread room to breathe without relying on SVG overflow to render correctly.
+const CX = 300, CY = 300;
 
+// Orbit radii are spread with growing gaps (56/56/56/56 minimum, widening further
+// out) so each ring reads as clearly, deliberately farther than the last — a real
+// solar-system hierarchy rather than compressed concentric rings.
 const ORBITS = [
-  { idx: 0, rx: 62,  ry: 20, tilt: -22, dur: 14, step: "01", label: "DISCOVER" },
-  { idx: 1, rx: 98,  ry: 33, tilt: -11, dur: 20, step: "02", label: "PLAN"     },
-  { idx: 2, rx: 134, ry: 47, tilt: -2,  dur: 28, step: "03", label: "CREATE"   },
-  { idx: 3, rx: 170, ry: 61, tilt:  8,  dur: 38, step: "04", label: "LAUNCH"   },
-  { idx: 4, rx: 206, ry: 75, tilt: 18,  dur: 50, step: "05", label: "GROW"     },
+  { idx: 0, rx: 70,  ry: 24,  tilt: -22, dur: 16, step: "01", label: "DISCOVER" },
+  { idx: 1, rx: 126, ry: 42,  tilt: -11, dur: 24, step: "02", label: "PLAN"     },
+  { idx: 2, rx: 182, ry: 62,  tilt: -2,  dur: 34, step: "03", label: "CREATE"   },
+  { idx: 3, rx: 238, ry: 83,  tilt:  8,  dur: 46, step: "04", label: "LAUNCH"   },
+  { idx: 4, rx: 294, ry: 106, tilt: 18,  dur: 60, step: "05", label: "GROW"     },
 ];
 
 // Full ellipse path for animateMotion (centred at CX, CY)
@@ -35,20 +40,24 @@ function OrbitalViz({
   activeStep,
   onOrbitHover,
   isLight,
-  accent,
 }: {
   activeStep: number | null;
   onOrbitHover: (idx: number | null) => void;
   isLight: boolean;
-  accent: string;
 }) {
-  const orbitBase  = isLight ? "rgba(0,48,73,0.15)"    : "rgba(255,255,255,0.13)";
-  const nodeBase   = isLight ? "rgba(0,48,73,0.50)"    : "rgba(191,194,199,0.50)";
-  const labelBase  = isLight ? "rgba(0,48,73,0.45)"    : "rgba(191,194,199,0.42)";
-  const labelSub   = isLight ? "rgba(0,48,73,0.28)"    : "rgba(191,194,199,0.28)";
+  // Orbit lines are always visible at rest now (not "almost invisible until hover").
+  const orbitBase  = isLight ? "rgba(0,48,73,0.10)"  : "rgba(255,255,255,0.08)";
+  const nodeBase   = isLight ? "rgba(0,48,73,0.50)"  : "rgba(191,194,199,0.50)";
+  // Active orbit always transitions to the same RIVAN red regardless of theme.
+  const activeColor = "#C1121F";
+  const activeGlow  = "rgba(193,18,31,0.35)";
+  const labelBase   = isLight ? "#669BBC" : "rgba(255,255,255,0.45)";
+  const labelSub    = isLight ? "rgba(102,155,188,0.65)" : "rgba(255,255,255,0.28)";
+  const transition  = "0.7s cubic-bezier(0.22,1,0.36,1)";
+  const isHoveringAny = activeStep !== null;
 
   return (
-    <svg viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg"
+    <svg viewBox="0 0 600 600" fill="none" xmlns="http://www.w3.org/2000/svg"
       className="w-full h-full select-none" style={{ overflow: "visible" }}>
       <defs>
         <radialGradient id="cryDark" cx="50%" cy="32%" r="68%">
@@ -76,13 +85,23 @@ function OrbitalViz({
       </defs>
 
       {/* Ambient soft glow rings behind crystal */}
-      <circle cx={CX} cy={CY} r={58}
+      <circle cx={CX} cy={CY} r={64}
         fill={isLight ? "rgba(193,18,31,0.04)" : "rgba(177,18,38,0.06)"} />
-      <circle cx={CX} cy={CY} r={42}
+      <circle cx={CX} cy={CY} r={47}
         fill={isLight ? "rgba(193,18,31,0.06)" : "rgba(177,18,38,0.10)"}>
-        <animate attributeName="r"       values="42;48;42" dur="5s" repeatCount="indefinite" />
+        <animate attributeName="r"       values="47;53;47" dur="5s" repeatCount="indefinite" />
         <animate attributeName="opacity" values="1;0.55;1" dur="5s" repeatCount="indefinite" />
       </circle>
+      {/* Hover pulse — the crystal emits a subtle red pulse whenever any orbit/step
+          is active, eased in with the same luxurious timing as the orbits */}
+      <circle cx={CX} cy={CY}
+        style={{
+          r: isHoveringAny ? 72 : 47,
+          opacity: isHoveringAny ? 0.22 : 0,
+          transition: `r ${transition}, opacity ${transition}`,
+        }}
+        fill={activeColor}
+        filter="url(#fGlow)" />
 
       {/* ── Orbits ── */}
       {ORBITS.map((o) => {
@@ -103,18 +122,19 @@ function OrbitalViz({
               onMouseEnter={() => onOrbitHover(o.idx)}
               onMouseLeave={() => onOrbitHover(null)}
             >
-              {/* Active orbit background glow line */}
+              {/* Active orbit glow — soft red halo, eases in/out with the rest */}
               {isAct && (
                 <ellipse cx={CX} cy={CY} rx={o.rx} ry={o.ry}
-                  stroke={accent} strokeWidth={8} opacity={0.07}
-                  filter="url(#fGlow)" />
+                  stroke={activeGlow} strokeWidth={10} opacity={0.6}
+                  filter="url(#fGlow)"
+                  style={{ transition: `opacity ${transition}` }} />
               )}
-              {/* Main orbit line */}
+              {/* Main orbit line — always visible at rest, eases to RIVAN red on hover */}
               <ellipse cx={CX} cy={CY} rx={o.rx} ry={o.ry}
-                stroke={isAct ? accent : orbitBase}
-                strokeWidth={isAct ? 1.5 : 0.85}
-                opacity={isDim ? 0.28 : 1}
-                style={{ transition: "stroke 0.4s, stroke-width 0.4s, opacity 0.4s" }}
+                stroke={isAct ? activeColor : orbitBase}
+                strokeWidth={isAct ? 2 : 1.1}
+                opacity={isDim ? 0.4 : 1}
+                style={{ transition: `stroke ${transition}, stroke-width ${transition}, opacity ${transition}` }}
               />
               {/* Tick marks at cardinal points on orbit */}
               {[0, 90, 180, 270].map(deg => {
@@ -122,15 +142,15 @@ function OrbitalViz({
                 const tx = CX + o.rx * Math.cos(ar);
                 const ty = CY + o.ry * Math.sin(ar);
                 return (
-                  <circle key={deg} cx={tx} cy={ty} r={isAct ? 2 : 1.2}
-                    fill={isAct ? accent : orbitBase}
-                    opacity={isDim ? 0.25 : 0.6}
-                    style={{ transition: "all 0.4s" }} />
+                  <circle key={deg} cx={tx} cy={ty} r={isAct ? 2.4 : 1.4}
+                    fill={isAct ? activeColor : orbitBase}
+                    opacity={isDim ? 0.35 : 0.75}
+                    style={{ transition: `all ${transition}` }} />
                 );
               })}
 
               {/* Animated node */}
-              <g opacity={isDim ? 0.35 : 1} style={{ transition: "opacity 0.4s" }}>
+              <g opacity={isDim ? 0.35 : 1} style={{ transition: `opacity ${transition}` }}>
                 {/* animateMotion moves the origin of this g along the orbit */}
                 <animateMotion
                   path={ePath(o.rx, o.ry)}
@@ -139,7 +159,7 @@ function OrbitalViz({
                 />
                 {/* Outer pulse (active) */}
                 {isAct && (
-                  <circle r={13} fill="none" stroke={accent} strokeWidth={0.8} opacity={0.45}>
+                  <circle r={13} fill="none" stroke={activeColor} strokeWidth={0.8} opacity={0.45}>
                     <animate attributeName="r"       values="10;16;10" dur="2.8s" repeatCount="indefinite" />
                     <animate attributeName="opacity" values="0.45;0.1;0.45" dur="2.8s" repeatCount="indefinite" />
                   </circle>
@@ -147,11 +167,11 @@ function OrbitalViz({
                 {/* Diamond node */}
                 <polygon
                   points={`0,${isAct ? -7 : -5} ${isAct ? 7 : 5},0 0,${isAct ? 7 : 5} ${isAct ? -7 : -5},0`}
-                  fill={isAct ? accent : nodeBase}
+                  fill={isAct ? activeColor : nodeBase}
                   stroke={isAct ? "rgba(255,255,255,0.55)" : (isLight ? "rgba(0,48,73,0.22)" : "rgba(255,255,255,0.18)")}
                   strokeWidth="0.6"
                   filter={isAct ? "url(#fNode)" : undefined}
-                  style={{ transition: "all 0.35s" }}
+                  style={{ transition: `all ${transition}` }}
                 />
                 {/* Inner highlight */}
                 <circle r={isAct ? 2.5 : 1.8}
@@ -163,30 +183,30 @@ function OrbitalViz({
 
             {/* Label — static, at rightmost point of orbit after tilt */}
             <g
-              opacity={isDim ? 0.28 : 1}
-              style={{ transition: "opacity 0.4s", cursor: "pointer" }}
+              opacity={isDim ? 0.4 : 1}
+              style={{ transition: `opacity ${transition}`, cursor: "pointer" }}
               onMouseEnter={() => onOrbitHover(o.idx)}
               onMouseLeave={() => onOrbitHover(null)}
             >
               {/* Connector dot */}
               <circle cx={lx + 5} cy={ly}
                 r={isAct ? 2.8 : 1.8}
-                fill={isAct ? accent : orbitBase}
-                style={{ transition: "all 0.4s" }} />
+                fill={isAct ? activeColor : orbitBase}
+                style={{ transition: `all ${transition}` }} />
               {/* Step number */}
               <text x={lx + 12} y={ly - 3}
-                fontSize="6.5" fontFamily="var(--font-jakarta), sans-serif"
+                fontSize="7" fontFamily="var(--font-jakarta), sans-serif"
                 fontWeight="700" letterSpacing="0.12em"
-                fill={isAct ? accent : labelSub}
-                style={{ transition: "fill 0.4s" }}>
+                fill={isAct ? activeColor : labelSub}
+                style={{ transition: `fill ${transition}` }}>
                 {o.step}
               </text>
               {/* Step name */}
-              <text x={lx + 12} y={ly + 8}
-                fontSize="7.5" fontFamily="var(--font-sora), sans-serif"
-                fontWeight="800" letterSpacing="0.18em"
-                fill={isAct ? accent : labelBase}
-                style={{ transition: "fill 0.4s" }}>
+              <text x={lx + 12} y={ly + 9}
+                fontSize="8.5" fontFamily="var(--font-sora), sans-serif"
+                fontWeight={isAct ? 600 : 800} letterSpacing="0.18em"
+                fill={isAct ? activeColor : labelBase}
+                style={{ transition: `fill ${transition}, font-weight ${transition}` }}>
                 {o.label}
               </text>
             </g>
@@ -212,12 +232,12 @@ function OrbitalViz({
             additive="sum" />
 
           {/* Outer ring */}
-          <circle cx={CX} cy={CY} r={40}
+          <circle cx={CX} cy={CY} r={46}
             stroke={isLight ? "rgba(193,18,31,0.14)" : "rgba(177,18,38,0.18)"}
             strokeWidth="0.6" strokeDasharray="3 5" />
 
-          {/* Main crystal body */}
-          <polygon points={hexPoints(CX, CY, 34)}
+          {/* Main crystal body — slightly larger, raising its visual importance */}
+          <polygon points={hexPoints(CX, CY, 38)}
             fill={isLight ? "url(#cryLight)" : "url(#cryDark)"}
             stroke={isLight ? "rgba(102,155,188,0.55)" : "rgba(177,18,38,0.40)"}
             strokeWidth="0.8"
@@ -225,32 +245,32 @@ function OrbitalViz({
 
           {/* Top facet — brightest */}
           <polygon
-            points={`${CX},${CY - 34} ${CX + 19},${CY - 9} ${CX - 19},${CY - 9}`}
+            points={`${CX},${CY - 38} ${CX + 21},${CY - 10} ${CX - 21},${CY - 10}`}
             fill={isLight ? "rgba(255,255,255,0.55)" : "rgba(177,18,38,0.13)"}
             stroke={isLight ? "rgba(255,255,255,0.8)"  : "rgba(177,18,38,0.22)"}
             strokeWidth="0.35" />
 
           {/* Bottom-right facet */}
           <polygon
-            points={`${CX},${CY + 34} ${CX + 19},${CY + 9} ${CX + 29},${CY - 8}`}
+            points={`${CX},${CY + 38} ${CX + 21},${CY + 10} ${CX + 32},${CY - 9}`}
             fill={isLight ? "rgba(102,155,188,0.22)" : "rgba(70,70,110,0.18)"}
             stroke={isLight ? "rgba(102,155,188,0.35)" : "rgba(100,100,140,0.14)"}
             strokeWidth="0.3" />
 
           {/* Bottom-left facet */}
           <polygon
-            points={`${CX},${CY + 34} ${CX - 19},${CY + 9} ${CX - 29},${CY - 8}`}
+            points={`${CX},${CY + 38} ${CX - 21},${CY + 10} ${CX - 32},${CY - 9}`}
             fill={isLight ? "rgba(200,222,238,0.18)" : "rgba(35,35,65,0.22)"}
             stroke={isLight ? "rgba(150,195,215,0.28)" : "rgba(70,70,115,0.14)"}
             strokeWidth="0.3" />
 
           {/* Specular highlight */}
-          <ellipse cx={CX - 9} cy={CY - 13} rx={7} ry={4}
+          <ellipse cx={CX - 10} cy={CY - 14} rx={8} ry={4.5}
             fill={isLight ? "rgba(255,255,255,0.70)" : "rgba(255,255,255,0.14)"}
-            transform={`rotate(-28, ${CX - 9}, ${CY - 13})`} />
+            transform={`rotate(-28, ${CX - 10}, ${CY - 14})`} />
 
           {/* Ruby heart glow */}
-          <circle cx={CX} cy={CY} r={15}
+          <circle cx={CX} cy={CY} r={17}
             fill={isLight ? "rgba(193,18,31,0.08)" : "rgba(177,18,38,0.12)"}>
             <animate attributeName="opacity" values="1;0.5;1" dur="3.5s" repeatCount="indefinite" />
           </circle>
@@ -259,14 +279,14 @@ function OrbitalViz({
           <text x={CX} y={CY + 5}
             textAnchor="middle"
             fontFamily="var(--font-sora), sans-serif"
-            fontSize="8.5" fontWeight="900"
+            fontSize="9.5" fontWeight="900"
             letterSpacing="0.38em"
             fill={isLight ? "rgba(0,48,73,0.35)" : "rgba(248,248,248,0.26)"}>
             RIVAN
           </text>
 
           {/* Crystal shimmer sweep */}
-          <polygon points={hexPoints(CX, CY, 34)}
+          <polygon points={hexPoints(CX, CY, 38)}
             fill="none"
             stroke="rgba(255,255,255,0.10)"
             strokeWidth="6">
@@ -342,7 +362,68 @@ export default function Process() {
       <div className="absolute top-1/3 right-0 -translate-y-1/2 w-[480px] h-[480px] rounded-full blur-[160px] pointer-events-none"
         style={{ background: isLight ? "rgba(193,18,31,0.035)" : "rgba(177,18,38,0.045)" }} />
 
-      <div className="max-w-7xl mx-auto">
+      {/* ── Cinematic seam into Manifesto: fog, crystals, dust, volumetric light ── */}
+      <div className="absolute inset-x-0 bottom-0 h-[34vh] min-h-[260px] pointer-events-none z-0" aria-hidden="true">
+        {/* Vertical atmospheric fade — light mode only (warm/cream rise toward Manifesto).
+            Dark mode has no gradient layer here at all: any full-width overlay, even at
+            near-zero alpha, was still reading as a faint band against the page's pure
+            black. Process should end on the page's own black with nothing stacked on top. */}
+        {isLight && (
+          <div className="absolute inset-0" style={{
+            background: "linear-gradient(to bottom, rgba(253,240,213,0) 0%, rgba(248,225,180,0.08) 55%, rgba(248,225,180,0.18) 100%)",
+          }} />
+        )}
+
+        {/* Floating crystal fragments near the seam. Light mode keeps float+rotate;
+            dark mode holds them still — glow only. */}
+        <div style={{
+          position: "absolute", bottom: "20%", left: "9%", width: 44, height: 58,
+          clipPath: "polygon(50% 0%, 88% 35%, 70% 100%, 30% 100%, 12% 35%)",
+          background: "rgba(177,18,38,0.05)", border: "1px solid rgba(177,18,38,0.12)",
+          filter: "blur(0.5px)", animation: isLight ? "crystalFloat 13s ease-in-out infinite alternate" : "crystalGlow 10s ease-in-out infinite",
+        }} />
+        <div style={{
+          position: "absolute", bottom: "32%", right: "13%", width: 28, height: 36,
+          clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)",
+          background: "rgba(191,194,199,0.04)", border: "1px solid rgba(255,255,255,0.06)",
+          animation: isLight ? "crystalFloat 16s ease-in-out 2s infinite alternate" : "crystalGlow 12s ease-in-out 2s infinite",
+        }} />
+
+        {/* Soft cloud atmosphere — light mode only (see note above re: dark mode bands) */}
+        {isLight && (
+          <div style={{
+            position: "absolute", bottom: "4%", left: "18%", width: "44%", height: "55%",
+            background: "radial-gradient(ellipse 60% 100% at 50% 50%, rgba(248,248,248,0.06) 0%, transparent 75%)",
+            filter: "blur(16px)",
+          }} />
+        )}
+
+        {/* Light dust drifting upward toward Process content — kept at its original
+            intensity for light mode; softened for dark mode per the 3–10% bleed spec */}
+        {[...Array(6)].map((_, i) => (
+          <div key={i} style={{
+            position: "absolute", bottom: `${4 + i * 6}%`, left: `${10 + i * 14}%`,
+            width: 3, height: 3, borderRadius: "50%",
+            background: isLight ? "rgba(248,232,200,0.32)" : "rgba(248,232,200,0.08)",
+            animation: `dustDrift ${8 + i}s ease-in-out ${i * 0.7}s infinite`,
+          }} />
+        ))}
+
+        {/* Glass reflection sweep — light mode only. This horizontal traveling sweep,
+            duplicated independently in the Manifesto seam, is what made dark mode's
+            lighting feel like a disconnected website effect rather than atmosphere. */}
+        {isLight && (
+          <div style={{ position: "absolute", inset: 0, overflow: "hidden" }}>
+            <div style={{
+              position: "absolute", top: 0, bottom: 0, width: "30%",
+              background: "linear-gradient(100deg, transparent, rgba(255,255,255,0.04), transparent)",
+              animation: "glassReflect 9s ease-in-out infinite",
+            }} />
+          </div>
+        )}
+      </div>
+
+      <div className="relative z-10 max-w-7xl mx-auto">
         {/* Mobile: orbital on top; Desktop: side-by-side */}
         <div className="flex flex-col-reverse lg:flex-row gap-10 lg:gap-6 items-start">
 
@@ -485,7 +566,6 @@ export default function Process() {
                 activeStep={activeStep}
                 onOrbitHover={setHoveredStep}
                 isLight={isLight}
-                accent={accent}
               />
 
               {/* "METHODOLOGY" label below orb */}

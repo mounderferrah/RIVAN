@@ -85,7 +85,8 @@ export default function Hero() {
             backgroundSize: "cover",
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
-            opacity: isLight ? 0.55 : 0.40,
+            opacity: isLight ? 1 : 0.75,
+            filter: isLight ? "contrast(1.04) saturate(1.04)" : undefined,
             animation: "cloudDrift 28s ease-in-out infinite",
             willChange: "transform",
           }}
@@ -170,11 +171,27 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Cinematic Vignette */}
-      <div
-        className="absolute inset-0 pointer-events-none z-0"
-        style={{ background: isLight ? "radial-gradient(ellipse at center, transparent 40%, rgba(253,240,213,0.6) 100%)" : "radial-gradient(ellipse at center, transparent 40%, rgba(5,5,5,0.9) 100%)" }}
-      />
+      {/* Cinematic Vignette — dark mode only. Light mode previously faded the
+          artwork into a heavy cream haze at the edges/corners; the artwork should
+          now display naturally all the way to the corners in Light Mode. */}
+      {!isLight && (
+        <div
+          className="absolute inset-0 pointer-events-none z-0"
+          style={{ background: "radial-gradient(ellipse at center, transparent 40%, rgba(5,5,5,0.9) 100%)" }}
+        />
+      )}
+
+      {/* Light Mode only: a tight, subtle darkening directly behind the headline
+          block so the text stays highly readable without dimming the artwork
+          globally — the hands/clouds elsewhere keep their full presence. */}
+      {isLight && (
+        <div
+          className="absolute inset-0 pointer-events-none z-0"
+          style={{
+            background: "radial-gradient(ellipse 55% 48% at 50% 42%, rgba(0,48,73,0.16) 0%, rgba(0,48,73,0.06) 55%, transparent 80%)",
+          }}
+        />
+      )}
 
       {/* Camera Crosshair Indicators */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 pointer-events-none opacity-10 z-10">

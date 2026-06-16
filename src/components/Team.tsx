@@ -639,11 +639,73 @@ export default function Team() {
 
   return (
     <section id="team" className="py-24 md:py-32 relative overflow-hidden bg-transparent">
+      {/* ── Entry atmosphere from Manifesto: receives the dissolving clouds, the last
+          faint crystal traces, and the continuing dust — no hard start to this section.
+          Light mode merges from the same warm cream Manifesto dissolved into (Team's
+          own background is #FDF0D5 too in light mode, so almost nothing is needed
+          there); dark mode eases the remaining charcoal down to Team's near-black base. ── */}
+      <div
+        className="absolute inset-x-0 top-0 pointer-events-none overflow-hidden z-0"
+        style={{ height: isLight ? "30vh" : "38vh", minHeight: isLight ? 230 : 280 }}
+        aria-hidden="true"
+      >
+        {/* Vertical fade. Light mode unchanged. Dark mode reduced in contrast/peak so the
+            handoff from Manifesto reads as evaporating atmosphere, not a fade-to-black. */}
+        <div className="absolute inset-0" style={{
+          background: isLight
+            ? "linear-gradient(to bottom, rgba(253,240,213,0.5) 0%, rgba(253,240,213,0.18) 45%, rgba(253,240,213,0) 80%)"
+            : "linear-gradient(to bottom, rgba(9,8,9,0.32) 0%, rgba(13,11,13,0.13) 45%, transparent 85%)",
+        }} />
+
+        {/* Faint cloud remnants — light mode unchanged. Dark mode keeps a wisp lingering
+            behind the heading itself (extended further down, very soft) instead of fully
+            dissolving right at the top of the band. */}
+        <div style={{
+          position: "absolute", top: "2%", left: "22%", width: "24%", height: "30%",
+          background: `radial-gradient(ellipse 60% 100% at 50% 50%, rgba(248,248,248,${isLight ? 0.025 : 0.018}) 0%, transparent 75%)`,
+          filter: `blur(${isLight ? 12 : 16}px)`, animation: "mistDriftFg 29s ease-in-out infinite",
+        }} />
+        {!isLight && (
+          <div style={{
+            position: "absolute", top: "30%", left: "40%", width: "30%", height: "26%",
+            background: "radial-gradient(ellipse 60% 100% at 50% 50%, rgba(248,225,180,0.022) 0%, transparent 78%)",
+            filter: "blur(18px)", animation: "mistDriftBg 33s ease-in-out 5s infinite",
+          }} />
+        )}
+
+        {/* Crystal fragments that survived the boundary, faded to a trace (5–10% opacity).
+            Light mode keeps float+rotate; dark mode holds them still — glow only. */}
+        <div style={{
+          position: "absolute", top: "14%", left: "13%", width: 26, height: 33,
+          clipPath: "polygon(50% 0%, 88% 35%, 70% 100%, 30% 100%, 12% 35%)",
+          background: "rgba(177,18,38,0.04)", border: "1px solid rgba(177,18,38,0.08)",
+          filter: "blur(0.5px)", opacity: 0.06, animation: isLight ? "crystalFloat 16s ease-in-out 1s infinite alternate" : "crystalGlow 11s ease-in-out 1s infinite",
+        }} />
+        <div style={{
+          position: "absolute", top: "20%", right: "12%", width: 20, height: 26,
+          clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)",
+          background: "rgba(191,194,199,0.045)", border: "1px solid rgba(255,255,255,0.06)",
+          opacity: 0.08, animation: isLight ? "crystalFloat 13s ease-in-out 4s infinite alternate" : "crystalGlow 9s ease-in-out 4s infinite",
+        }} />
+
+        {/* Dust continuing the same drift, fading out as the atmosphere settles.
+            Light mode unchanged; dark mode eased to the 3–8% range and given a couple
+            extra motes since the band now extends further down. */}
+        {[...Array(isLight ? 5 : 7)].map((_, i) => (
+          <div key={i} style={{
+            position: "absolute", top: `${4 + i * 5}%`, left: `${16 + i * 12}%`,
+            width: 2.5, height: 2.5, borderRadius: "50%",
+            background: isLight ? "rgba(193,18,31,0.15)" : "rgba(248,232,200,0.07)",
+            animation: `dustDrift ${11 + i}s ease-in-out ${i * 0.9}s infinite`,
+          }} />
+        ))}
+      </div>
+
       {/* Ambient ruby glow */}
       <div className="absolute bottom-1/3 right-0 w-[450px] h-[450px] rounded-full pointer-events-none" style={{ background: "rgba(177,18,38,0.04)", filter: "blur(140px)" }} />
 
       {/* Section header */}
-      <div className="px-6 md:px-12 mb-14 max-w-7xl mx-auto">
+      <div className="relative z-10 px-6 md:px-12 mb-14 max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-[200px_1fr] gap-10 items-end">
 
           {/* LEFT — decorative editorial panel */}
