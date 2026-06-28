@@ -51,24 +51,11 @@ const members: Member[] = [
     imageAlt: "Boumendjel Zakaria — Marketing & Media Director",
   },
   {
-    name: "Ayoub Zenad",
-    position: "Visual Production Specialist",
-    roles: ["Photographer", "Videographer", "Commercial Filmmaker", "Product Marketing"],
-    initials: "AZ",
-    num: "03",
-    fullTitle: "Visual Production Specialist",
-    expandedRoles: ["Photography", "Videography", "Commercial Filmmaking", "Product Marketing", "Visual Storytelling"],
-    expandedDesc: "Ayoub creates impactful visual content that elevates brands and strengthens their identity.",
-    descKey: "ayoubDesc",
-    imageHint: "Photography scene — camera equipment on location",
-    imageAlt: "Ayoub Zenad — Visual Production Specialist",
-  },
-  {
     name: "Bencheikh M. Mehdi",
     position: "Creative Production Manager",
     roles: ["Video Editor", "VFX Artist", "High-End Visuals", "Team Management"],
     initials: "BM",
-    num: "04",
+    num: "03",
     fullTitle: "Creative Production Manager",
     expandedRoles: ["Video Editing", "VFX", "Motion Graphics", "Creative Direction", "Visual Production"],
     expandedDesc: "Mehdi oversees post-production and visual excellence.",
@@ -78,17 +65,17 @@ const members: Member[] = [
     imageSrc: "/meh.jpeg",
   },
   {
-    name: "Adem",
+    name: "Belaggoun Adem",
     position: "Business Development",
     roles: ["Commercial Representative", "Marketing Specialist", "Client Relations"],
     initials: "AD",
-    num: "05",
+    num: "04",
     fullTitle: "Business Development Manager",
     expandedRoles: ["Business Development", "Marketing", "Client Relations", "Commercial Strategy"],
     expandedDesc: "Adem focuses on building partnerships and creating growth opportunities.",
     descKey: "ademDesc",
     imageHint: "Business meetings — marketing strategy sessions",
-    imageAlt: "Adem — Business Development Manager",
+    imageAlt: "Belaggoun Adem — Business Development Manager",
   },
 ];
 
@@ -732,7 +719,7 @@ export default function Team() {
                 className="font-heading font-black leading-none"
                 style={{ fontSize: "clamp(3.5rem, 6vw, 5.5rem)", color: "#B11226", opacity: 0.85 }}
               >
-                05
+                04
               </span>
               <span style={{ fontSize: 8, letterSpacing: "0.45em", color: isLight ? "rgba(0,48,73,0.55)" : "rgba(191,194,199,0.28)", textTransform: "uppercase", fontFamily: "var(--font-jakarta)", fontWeight: 700 }}>
                 {t("team", "members")}

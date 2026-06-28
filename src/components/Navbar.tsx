@@ -11,6 +11,7 @@ import ThemeSwitcher from "@/components/ThemeSwitcher";
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [hovered, setHovered] = useState<string | null>(null);
   const { t } = useLanguage();
   const { theme } = useTheme();
   const isLight = theme === "light";
@@ -58,8 +59,11 @@ export default function Navbar() {
               />
             )}
             <span
-              className="relative text-2xl md:text-3xl font-heading font-black tracking-widest transition-all"
-              style={{ color: isLight ? "#003049" : "var(--th-text)", fontWeight: isLight ? 800 : undefined }}
+              className="relative text-2xl md:text-3xl font-heading font-black tracking-widest transition-all duration-300"
+              style={{
+                color: isLight ? (isScrolled ? "#003049" : "#F8F8F8") : "var(--th-text)",
+                fontWeight: isLight ? 800 : undefined,
+              }}
             >
               RIVAN
             </span>
@@ -73,18 +77,29 @@ export default function Navbar() {
                 key={link.name}
                 href={link.href}
                 className={`text-sm font-sans relative group py-2 clickable ${
-                  isLight
-                    ? "text-[#003049] font-semibold hover:text-[#C1121F] transition-colors duration-300"
-                    : "tracking-wide transition-colors"
+                  isLight ? "font-semibold" : "tracking-wide transition-colors"
                 }`}
+                // Color is set inline (not via a `text-[#...]` class) on purpose:
+                // globals.css remaps `text-[#F8F8F8]` → theme blue with !important
+                // in light mode, which would override a utility class.
                 style={
                   isLight
-                    ? { letterSpacing: "0.02em", textShadow: "0 1px 4px rgba(255,255,255,0.25)" }
+                    ? {
+                        color: isScrolled ? "#003049" : "#F8F8F8",
+                        letterSpacing: "0.02em",
+                        textShadow: isScrolled
+                          ? "0 1px 4px rgba(255,255,255,0.25)"
+                          : "0 1px 6px rgba(0,0,0,0.35)",
+                        transition: "color 0.3s ease, text-shadow 0.3s ease",
+                      }
                     : { color: "var(--th-muted)" }
                 }
               >
                 {link.name}
-                <span className="absolute bottom-0 left-0 w-0 h-[1px] group-hover:w-full transition-all duration-300" style={{ background: "var(--th-brand)" }} />
+                <span
+                  className="absolute bottom-0 left-0 w-0 h-[1px] group-hover:w-full transition-all duration-300"
+                  style={{ background: isLight && !isScrolled ? "#F8F8F8" : "var(--th-brand)" }}
+                />
               </a>
             ))}
           </div>
@@ -98,12 +113,29 @@ export default function Navbar() {
 
             <a
               href="#contact"
+              onMouseEnter={() => setHovered("cta")}
+              onMouseLeave={() => setHovered(null)}
               className={
                 isLight
-                  ? "hidden sm:inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-bold bg-[#C1121F] text-white hover:bg-[#780000] hover:shadow-[0_10px_30px_rgba(193,18,31,0.25)] transition-all duration-300 clickable"
+                  ? "hidden sm:inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 clickable"
                   : "hidden sm:inline-flex items-center gap-2 px-6 py-2.5 rounded-full border border-[#BFC2C7]/30 text-sm font-medium tracking-wide bg-transparent hover:bg-[#B11226] text-[#F8F8F8] hover:border-[#B11226] hover:shadow-[0_0_20px_rgba(177,18,38,0.3)] transition-all duration-300 clickable"
               }
-              style={isLight ? { letterSpacing: "0.04em" } : undefined}
+              // Light-mode colors set inline so the globals.css !important theme
+              // remaps (e.g. text-white → blue) can't override the white button.
+              style={
+                isLight
+                  ? {
+                      letterSpacing: "0.04em",
+                      background: hovered === "cta" ? "#C1121F" : "#FFFFFF",
+                      color: hovered === "cta" ? "#FFFFFF" : "#C1121F",
+                      border: "1px solid rgba(193,18,31,0.30)",
+                      boxShadow:
+                        hovered === "cta"
+                          ? "0 10px 30px rgba(193,18,31,0.28)"
+                          : "0 4px 16px rgba(0,0,0,0.10)",
+                    }
+                  : undefined
+              }
             >
               {t("nav", "workWithUs")}
               <ArrowRight size={14} />

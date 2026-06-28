@@ -73,37 +73,61 @@ export default function Contact() {
             {/* Quick Contact buttons */}
             <div className="flex flex-col gap-4">
               <a
-                href="https://wa.me/213000000000"
+                href="https://wa.me/213549573508?text=Hello%20RIVAN,%20I%20would%20like%20to%20discuss%20a%20project%20with%20your%20team."
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group p-5 rounded-2xl glassmorphism border border-white/5 hover:border-[#BFC2C7]/15 hover:shadow-[0_0_20px_rgba(191,194,199,0.06)] flex items-center gap-4 transition-all duration-300 clickable"
+                aria-label="Contact RIVAN via WhatsApp"
+                className="group p-5 rounded-2xl glassmorphism border border-white/5 flex items-center gap-4 cursor-pointer clickable"
+                style={{ transition: "all 300ms ease" }}
+                onMouseEnter={e => {
+                  (e.currentTarget as HTMLElement).style.transform = "translateY(-4px)";
+                  (e.currentTarget as HTMLElement).style.borderColor = "#C1121F";
+                  (e.currentTarget as HTMLElement).style.boxShadow = "0 10px 30px rgba(0,0,0,0.08)";
+                }}
+                onMouseLeave={e => {
+                  (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
+                  (e.currentTarget as HTMLElement).style.borderColor = "";
+                  (e.currentTarget as HTMLElement).style.boxShadow = "";
+                }}
               >
-                <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 text-[#BFC2C7] group-hover:bg-white/10 group-hover:border-[#B11226]/30 group-hover:text-[#F8F8F8] transition-colors">
+                <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 text-[#BFC2C7] group-hover:bg-white/10 group-hover:border-[#B11226]/30 group-hover:text-[#F8F8F8] transition-colors flex-shrink-0">
                   <PhoneCall size={20} />
                 </div>
                 <div>
                   <h4 className="text-sm uppercase font-heading font-extrabold text-zinc-400">
                     {t("contact", "quickChat")}
                   </h4>
-                  <p className="text-base font-sans font-semibold text-white mt-0.5">
-                    {t("contact", "whatsapp")}
+                  <p className="text-base font-sans font-semibold text-white mt-0.5 group-hover:text-[#C1121F] transition-colors duration-300">
+                    +213 549 573 508
                   </p>
                 </div>
               </a>
 
               <a
-                href="mailto:contact@livan.agency"
-                className="group p-5 rounded-2xl glassmorphism border border-white/5 hover:border-[#BFC2C7]/15 hover:shadow-[0_0_20px_rgba(191,194,199,0.06)] flex items-center gap-4 transition-all duration-300 clickable"
+                href="mailto:rivancreative25@gmail.com?subject=Project%20Inquiry"
+                aria-label="Send an email to RIVAN"
+                className="group p-5 rounded-2xl glassmorphism border border-white/5 flex items-center gap-4 cursor-pointer clickable"
+                style={{ transition: "all 300ms ease" }}
+                onMouseEnter={e => {
+                  (e.currentTarget as HTMLElement).style.transform = "translateY(-4px)";
+                  (e.currentTarget as HTMLElement).style.borderColor = "#C1121F";
+                  (e.currentTarget as HTMLElement).style.boxShadow = "0 10px 30px rgba(0,0,0,0.08)";
+                }}
+                onMouseLeave={e => {
+                  (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
+                  (e.currentTarget as HTMLElement).style.borderColor = "";
+                  (e.currentTarget as HTMLElement).style.boxShadow = "";
+                }}
               >
-                <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 text-[#BFC2C7] group-hover:bg-white/10 group-hover:border-[#B11226]/30 group-hover:text-[#F8F8F8] transition-colors">
+                <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 text-[#BFC2C7] group-hover:bg-white/10 group-hover:border-[#B11226]/30 group-hover:text-[#F8F8F8] transition-colors flex-shrink-0">
                   <Mail size={20} />
                 </div>
                 <div>
                   <h4 className="text-sm uppercase font-heading font-extrabold text-zinc-400">
                     {t("contact", "emailUs")}
                   </h4>
-                  <p className="text-base font-sans font-semibold text-white mt-0.5">
-                    contact@livan.agency
+                  <p className="text-base font-sans font-semibold text-white mt-0.5 group-hover:text-[#C1121F] transition-colors duration-300">
+                    rivancreative25@gmail.com
                   </p>
                 </div>
               </a>
@@ -116,11 +140,13 @@ export default function Contact() {
               </span>
               <div className="flex gap-4">
                 <a
-                  href="#"
-                  className="w-10 h-10 rounded-full border border-white/10 bg-white/5 flex items-center justify-center text-white/70 hover:text-white hover:border-primary hover:bg-primary/20 transition-all duration-300 clickable"
-                  aria-label="Instagram"
+                  href="https://www.instagram.com/rivancreative"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Visit RIVAN Instagram page"
+                  className="w-10 h-10 rounded-full border border-white/10 bg-white/5 flex items-center justify-center text-white/70 hover:text-white hover:border-[#C1121F] hover:bg-[#C1121F]/20 transition-all duration-300 cursor-pointer clickable"
                 >
-                  <svg className="w-5.5 h-5.5 fill-none stroke-current" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" style={{ width: '18px', height: '18px' }}>
+                  <svg className="fill-none stroke-current" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" style={{ width: '18px', height: '18px' }}>
                     <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
                     <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
                     <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
@@ -131,7 +157,7 @@ export default function Contact() {
                   className="w-10 h-10 rounded-full border border-white/10 bg-white/5 flex items-center justify-center text-white/70 hover:text-white hover:border-primary hover:bg-primary/20 transition-all duration-300 clickable"
                   aria-label="LinkedIn"
                 >
-                  <svg className="w-5.5 h-5.5 fill-current" viewBox="0 0 24 24" style={{ width: '18px', height: '18px' }}>
+                  <svg className="fill-current" viewBox="0 0 24 24" style={{ width: '18px', height: '18px' }}>
                     <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
                   </svg>
                 </a>
@@ -140,7 +166,7 @@ export default function Contact() {
                   className="w-10 h-10 rounded-full border border-white/10 bg-white/5 flex items-center justify-center text-white/70 hover:text-white hover:border-primary hover:bg-primary/20 transition-all duration-300 clickable"
                   aria-label="YouTube"
                 >
-                  <svg className="w-5.5 h-5.5 fill-current" viewBox="0 0 24 24" style={{ width: '18px', height: '18px' }}>
+                  <svg className="fill-current" viewBox="0 0 24 24" style={{ width: '18px', height: '18px' }}>
                     <path d="M23.498 6.163c-.272-.997-1.09-1.781-2.115-2.052-1.867-.511-9.383-.511-9.383-.511s-7.516 0-9.383.511c-1.025.271-1.843 1.055-2.115 2.052-.512 1.867-.512 5.769-.512 5.769s0 3.902.512 5.769c.272.997 1.09 1.781 2.115 2.052 1.867.511 9.383.511 9.383.511s7.516 0 9.383-.511c1.025-.271 1.843-1.055 2.115-2.052.512-1.867.512-5.769.512-5.769s0-3.902-.512-5.769zm-13.498 9.337v-7l6 3.5-6 3.5z"/>
                   </svg>
                 </a>

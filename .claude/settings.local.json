@@ -2,6 +2,9 @@
   "permissions": {
     "allow": [
       "PowerShell(cd \"C:\\\\Users\\\\Tech-Space\\\\Desktop\\\\rival\"; npx tsc --noEmit 2>&1 | Where-Object { $_ -match \"Team.tsx\" } | Select-Object -First 20)"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\Tech-Space\\mimi\\src\\app"
     ]
   }
 }
